@@ -476,5 +476,9 @@ def detect_skin_tone():
 
 if __name__ == "__main__":
     # Load products (and embeddings if available) when the app starts
-    load_products() 
-    app.run(debug=True)
+    load_products()
+
+    # Use 0.0.0.0 to allow Render (and other platforms) to access your app
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
+
