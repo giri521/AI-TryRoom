@@ -1,7 +1,4 @@
 Flask
 requests
-Werkzeug
-itsdangerous
-Jinja2
-python-dotenv
-
+numpy
+Pillow
