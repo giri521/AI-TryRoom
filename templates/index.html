@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StyleSync AI | Fashion Outfit Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- NEW THEME: FASHION-FORWARD --- */
+        :root {
+            --color-primary: #1a1a2e; /* Deep Navy */
+            --color-accent: #e63946; /* Vibrant Red */
+            --color-secondary: #f1faee; /* Light Cream */
+            --color-gold: #ffd166; /* Gold Accent */
+            --color-background: #f8f9fa; /* Light Gray */
+            --color-card-bg: #ffffff;
+            --color-text-dark: #212529; /* Near-black */
+            --color-text-light: #6c757d; /* Muted gray */
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            background: var(--color-background); 
+            color: var(--color-text-dark);
+            overflow-x: hidden;
+        }
+        
+        /* --- Fashion Background --- */
+        .fashion-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(26,26,46,0.9) 0%, rgba(230,57,70,0.7) 100%), 
+                        url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+        
+        /* --- Header/Nav Styling --- */
+        .fashion-header { 
+            background: rgba(26, 26, 46, 0.95); 
+            color: var(--color-card-bg); 
+            padding: 15px 5vw; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); 
+            z-index: 100;
+            position: relative;
+        }
+        .logo { 
+            font-size: 28px; 
+            font-weight: 800; 
+            letter-spacing: 0.5px; 
+            text-decoration: none; 
+            color: var(--color-card-bg); 
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            color: var(--color-accent);
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        .nav-links { 
+            display: flex; 
+            align-items: center; 
+        }
+        .nav-links a { 
+            color: var(--color-card-bg); 
+            text-decoration: none; 
+            margin-left: 20px; 
+            font-size: 15px; 
+            padding: 8px 15px; 
+            border-radius: 6px; 
+            transition: all 0.3s ease; 
+            font-weight: 600;
+            position: relative;
+        }
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: var(--color-accent);
+            transition: all 0.3s ease;
+        }
+        .nav-links a:hover:after { 
+            width: 100%;
+            left: 0;
+        }
+        .user-info { 
+            font-size: 15px; 
+            font-weight: 400; 
+            margin-right: 15px; 
+            display: flex;
+            align-items: center;
+        }
+        .user-info i {
+            margin-right: 8px;
+            color: var(--color-gold);
+        }
+        
+        /* --- Search Bar Styling (Moved/Reworked) --- */
+        /* New container for the search bar under the hero */
+        .hero-search-container {
+            max-width: 600px;
+            margin: -50px auto 50px; /* Pull it up and give it a good bottom margin */
+            padding: 0 20px;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .search-container form { 
+            display: flex; 
+            border: 1px solid rgba(0,0,0,0.1); /* Lighter border for light background */
+            border-radius: 50px; 
+            overflow: hidden; 
+            background: var(--color-card-bg); /* White background */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* More pronounced shadow */
+        }
+        .search-container input[type="text"] { 
+            padding: 15px 25px; /* Increased padding */
+            border: none; 
+            flex-grow: 1; 
+            font-size: 16px; 
+            outline: none; 
+            background: transparent;
+            color: var(--color-text-dark); /* Dark text */
+        }
+        .search-container input::placeholder {
+            color: var(--color-text-light);
+        }
+        .search-container button { 
+            padding: 15px 30px; /* Increased padding */
+            background-color: var(--color-accent); 
+            border: none; 
+            cursor: pointer; 
+            color: white; 
+            font-weight: bold; 
+            transition: all 0.3s ease;
+        }
+        .search-container button:hover {
+            background-color: #c1121f; 
+            transform: scale(1.01);
+        }
+        
+        /* --- Hero Section --- */
+        .hero-section {
+            position: relative;
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 0 5vw;
+            margin-bottom: 50px; /* Remove original margin-bottom */
+        }
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+        }
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 15px 35px;
+            background: var(--color-accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(230,57,70,0.4);
+            margin-bottom: 20px; /* Added for separation from the search bar */
+        }
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(230,57,70,0.6);
+        }
+        
+        /* --- Flash Messages Styling --- */
+        .message { 
+            padding: 12px 5vw; 
+            text-align: center; 
+            color: white; 
+            margin-bottom: 0; 
+            font-weight: 600; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        .message.info { background-color: #059669; }
+        .message.warning { background-color: var(--color-gold); color: var(--color-text-dark); }
+        .message.error { background-color: #dc2626; }
+
+        /* --- Content Area --- */
+        .content-container { 
+            padding: 30px 20px; 
+            display: flex; 
+            justify-content: center; 
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* --- Product Grid Styling --- */
+        .product-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 30px; 
+            max-width: 1300px; 
+            margin: 0 auto; 
+        }
+        .product-card { 
+            background: var(--color-card-bg); 
+            border: none; 
+            border-radius: 15px; 
+            overflow: hidden; 
+            text-align: left; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+            display: block; 
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+        }
+        .product-card:hover {
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            transform: translateY(-10px);
+        }
+        .product-image { 
+            position: relative;
+            overflow: hidden;
+        }
+        .product-image img { 
+            width: 100%; 
+            height: 320px; 
+            object-fit: cover; 
+            display: block; 
+            transition: transform 0.5s ease;
+        }
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--color-accent);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .product-details { 
+            padding: 20px; 
+        }
+        .product-details h3 { 
+            margin: 0 0 8px 0; 
+            font-size: 18px; 
+            color: var(--color-text-dark);
+            font-weight: 700;
+        }
+        .product-details p { 
+            margin: 5px 0; 
+            font-size: 14px; 
+            color: var(--color-text-light); 
+        }
+        .product-details .price { 
+            font-size: 22px; 
+            color: var(--color-accent); 
+            font-weight: 800; 
+            margin-top: 10px; 
+        }
+        
+        /* --- Section Headers --- */
+        .section-header {
+            text-align: center;
+            margin: 60px 0 40px;
+            position: relative;
+        }
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--color-primary);
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .section-header:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--color-accent);
+            margin: 0 auto;
+            border-radius: 2px;
+        }
+        
+        /* --- Form/Profile Styling --- */
+        .form-box { 
+            max-width: 550px; 
+            margin: 30px auto; 
+            padding: 40px; 
+            background: var(--color-card-bg); 
+            border-radius: 15px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
+            position: relative;
+            z-index: 1;
+        }
+        .form-box h1 { 
+            color: var(--color-primary); 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 2px solid var(--color-accent); 
+            padding-bottom: 10px; 
+            font-size: 24px;
+        }
+        .form-box button { 
+            width: 100%; 
+            padding: 14px; 
+            background-color: var(--color-accent); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            margin-top: 25px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .form-box button:hover {
+            background-color: #c1121f;
+            transform: translateY(-2px);
+        }
+        .form-group { margin-bottom: 25px; }
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: var(--color-text-dark); 
+        }
+        select, input[type="text"], input[type="number"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            outline: none; 
+            transition: all 0.3s ease;
+        }
+        select:focus, input:focus {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(230,57,70,0.2);
+        }
+        .secondary-button { 
+            display: block; 
+            text-align: center; 
+            margin-top: 20px; 
+            padding: 12px 15px; 
+            background-color: var(--color-primary); 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            transition: all 0.3s ease;
+        }
+        .secondary-button:hover {
+            background-color: #0f0f1f;
+            transform: translateY(-2px);
+        }
+
+        /* NEW: Profile Details View */
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+        .detail-value {
+            color: var(--color-text-dark);
+        }
+
+
+        /* NEW: Skin Tone Swatch Styles (for Profile) */
+        .skin-tone-grid {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .skin-tone-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .skin-tone-swatch.selected {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 10px rgba(230,57,70,0.8);
+        }
+        .skin-tone-swatch.selected i {
+            color: white;
+            font-size: 1.2rem;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5);
+        }
+
+        /* NEW: Body Shape Preview Styles (for Profile) */
+        .body-shape-grid {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .body-shape-item {
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            width: 80px; /* Standardize size */
+        }
+        .body-shape-item:hover {
+            background-color: #f8f8f8;
+        }
+        .body-shape-item.selected {
+            border-color: var(--color-accent);
+            background-color: #ffeaea;
+        }
+        .body-shape-item .shape-container {
+            /* Container to hold the SVG/CSS shape */
+            width: 100%;
+            height: 100px; /* Fixed height for visual consistency */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+        /* Base style for the SVG/CSS shape */
+        .body-shape-item svg {
+            display: block;
+            width: 50px;
+            height: 90px;
+        }
+        /* Styling the body shape path */
+        .body-shape-path {
+            fill: var(--color-primary); /* Use primary color for the shape */
+            stroke: var(--color-primary);
+            stroke-width: 1;
+        }
+
+        .body-shape-item span {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+
+        /* --- Combo Display Styling --- */
+        .combo-container { 
+            max-width: 1300px; 
+            margin: 30px auto; 
+            text-align: center; 
+            background: var(--color-card-bg);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .combo-container h1 { 
+            color: var(--color-primary); 
+            margin-bottom: 20px;
+        }
+        .combo-grid { 
+            display: flex; 
+            justify-content: center; 
+            gap: 30px; 
+            flex-wrap: wrap; 
+            margin-top: 30px; 
+        }
+        .combo-card { 
+            background: var(--color-card-bg); 
+            border: 1px solid #e0e0e0; 
+            padding: 25px; 
+            border-radius: 15px; 
+            width: 30%; 
+            min-width: 320px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+            transition: all 0.3s ease; 
+        }
+        .combo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+        }
+        .combo-card h3 { 
+            color: var(--color-accent); 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 10px; 
+            margin-top: 0; 
+        }
+        .combo-card .item-list { 
+            text-align: left; 
+            margin-top: 15px; 
+        }
+        .combo-card .item-list p { 
+            margin: 10px 0; 
+            font-size: 15px; 
+            display: flex; 
+            align-items: center; 
+        }
+        .combo-card .item-list img { 
+            width: 45px; 
+            height: 45px; 
+            object-fit: cover; 
+            vertical-align: middle; 
+            margin-right: 15px; 
+            border-radius: 4px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .combo-select-button { 
+            background-color: var(--color-primary); 
+            color: white; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            width: 100%; 
+            font-weight: 600;
+            transition: all 0.3s ease; 
+        }
+        .combo-select-button:hover { 
+            background-color: #0f0f1f; 
+            transform: translateY(-2px);
+        }
+
+        /* --- Single Product Detail View / Train Room --- */
+        .single-product-view { 
+            max-width: 1200px; 
+            margin: 30px auto; 
+            display: flex; 
+            gap: 40px; 
+            justify-content: center; 
+            align-items: flex-start; 
+            background: var(--color-card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .detail-info { 
+            width: 400px; 
+            padding: 30px; 
+            background: var(--color-card-bg); 
+            border-radius: 12px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+        }
+        .detail-info h1 { 
+            color: var(--color-text-dark); 
+            margin-top: 0; 
+            font-size: 32px; 
+            font-weight: 800; 
+        }
+        .detail-info .category { 
+            color: var(--color-accent); 
+            font-weight: bold; 
+            margin-bottom: 15px; 
+            display: block; 
+            font-size: 16px; 
+        }
+        .detail-info .spec { 
+            margin-bottom: 12px; 
+            font-size: 16px; 
+        }
+        .detail-info .spec strong { 
+            color: var(--color-primary); 
+            font-weight: 600; 
+            margin-right: 5px; 
+        }
+        .detail-info .price { 
+            font-size: 36px; 
+            color: var(--color-accent); 
+            font-weight: 800; 
+            margin: 25px 0; 
+        }
+        
+        .train-room-2d-container { 
+            position: relative; 
+            width: 400px; 
+            height: 650px; 
+            margin: 0 auto;
+            background-color: #FFFFFF; /* Default set to white */
+            border-radius: 15px; 
+            box-shadow: 0 0 25px rgba(0,0,0,0.15); 
+            overflow: hidden; 
+        }
+        .mannequin-silhouette {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px; 
+            height: 100%;
+            z-index: 5; 
+            opacity: 0.2; 
+            background: linear-gradient(to bottom, #ddd 0%, #bbb 600px);
+            border-radius: 65px 65px 0 0; 
+        }
+        .mannequin-item {
+            position: absolute;
+            opacity: 0;
+            transition: opacity 0.5s;
+            object-fit: contain;
+            background-color: transparent;
+            mix-blend-mode: multiply; /* Simulated transparency */
+        }
+        /* Item positioning remains functional */
+        .mannequin-item[data-type="Top"], .mannequin-item[data-type="TopBottom"] { top: 80px; left: 50px; width: 300px; height: 250px; z-index: 20; }
+        .mannequin-item[data-type="Bottom"] { top: 250px; left: 80px; width: 240px; height: 350px; z-index: 10; }
+        .mannequin-item[data-type="Shoes"] { bottom: 0px; left: 100px; width: 200px; height: 150px; z-index: 30; }
+        .mannequin-item[data-type="Accessory"] { top: 0px; left: 150px; width: 100px; height: 80px; z-index: 40; }
+        
+        .train-room-main-area {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            margin: 20px auto;
+        }
+
+        /* Side Panel/Controls */
+        #combo-selector-panel {
+            padding: 20px;
+            background: var(--color-card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .combo-item-btn {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 8px; 
+        }
+        .combo-item-btn.active {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 8px rgba(230, 57, 70, 0.5); /* Red shadow */
+            background-color: #ffeaea; /* Light red background */
+        }
+        .combo-item-btn:hover {
+            background-color: #f7f7f7;
+            transform: translateX(5px);
+        }
+        .item-img {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            margin-right: 15px;
+            border-radius: 6px;
+        }
+        .item-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--color-primary);
+        }
+        
+        /* NEW: Color Swatch Styles */
+        .bg-color-swatch-container {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .bg-color-swatch-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .bg-color-swatch {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        .bg-color-swatch:hover {
+            transform: scale(1.1);
+        }
+        .bg-color-swatch.active {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 10px rgba(230,57,70,0.8);
+        }
+
+        .reason-box { 
+            background: #fdf6f7; /* Very light red background */
+            border-left: 5px solid var(--color-accent); 
+            padding: 20px; 
+            margin-top: 30px; 
+            text-align: left;
+            border-radius: 8px;
+            display: flex; /* Enable flex for image/text layout */
+            gap: 20px;
+            align-items: center;
+        }
+        .reason-box p { margin: 5px 0; }
+        .reason-box strong { color: var(--color-accent); }
+        .reason-box-content {
+            flex-grow: 1;
+        }
+        .reason-box-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* --- Footer --- */
+        .fashion-footer {
+            background: var(--color-primary);
+            color: white;
+            padding: 50px 5vw;
+            margin-top: 80px;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        .footer-column h3 {
+            color: var(--color-gold);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        .footer-column a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+        .footer-column a:hover {
+            color: white;
+        }
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .social-icons a:hover {
+            background: var(--color-accent);
+            transform: translateY(-3px);
+        }
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+        }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 1024px) {
+            .hero-content h1 {
+                font-size: 2.8rem;
+            }
+            .single-product-view {
+                flex-direction: column;
+                align-items: center;
+            }
+            .train-room-main-area {
+                flex-direction: column;
+            }
+            #combo-selector-panel {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .fashion-header {
+                flex-direction: column;
+                padding: 15px;
+            }
+            .nav-links {
+                margin-top: 15px;
+            }
+            .nav-links a {
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+            .hero-search-container {
+                max-width: 90%; /* Make search bar wider on mobile */
+                margin-top: -30px;
+            }
+            .search-container input[type="text"] {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+            .search-container button {
+                padding: 12px 25px;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            .combo-card {
+                width: 100%;
+            }
+            .reason-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fashion-bg"></div>
+
+    <header class="fashion-header">
+        <a href="{{ url_for('index') }}" class="logo">
+            <i class="fas fa-tshirt"></i>StyleSync AI
+        </a>
+        
+        <div class="nav-links">
+            <span class="user-info"><i class="fas fa-user"></i>Hello, {{ user }}</span>
+            <a href="{{ url_for('index', view='products') }}">Home</a>
+            <a href="{{ url_for('index', view='intent') }}">Special Look</a> 
+            <a href="{{ url_for('index', view='profile') }}">Profile</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </header>
+
+    {% if view_mode == 'products' %}
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Discover Your Perfect Style</h1>
+            <p>AI-powered fashion recommendations tailored just for you. Find outfits that match your personality, body type, and occasion.</p>
+            <a href="{{ url_for('index', view='intent') }}" class="cta-button">Get Styled Now</a>
+        </div>
+    </section>
+
+    <div class="hero-search-container search-container">
+        <form action="{{ url_for('index') }}" method="GET">
+            <input type="text" name="search" placeholder="Search for products, brands and more" 
+                            value="{{ request.args.get('search', '') }}">
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+    <div class="section-header">
+        <h2>Featured Products</h2>
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="message {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="content-container">
+
+        {% if view_mode == 'products' %}
+            <div class="product-grid">
+                {% for product in products %}
+                <a href="{{ url_for('index', view='single_product', product_id=product.id) }}" class="product-card">
+                    <div class="product-image">
+                        <img src="{{ product.imageUrl }}" alt="{{ product.name }}" onerror="this.onerror=null;this.src='https://placehold.co/300x400/CCCCCC/333333?text=Image+Missing';">
+                        <div class="product-badge">NEW</div>
+                    </div>
+                    <div class="product-details">
+                        <h3>{{ product.name }}</h3>
+                        <p>{{ product.category }} ({{ product.color }})</p>
+                        <div class="price">₹{{ product.price }}</div>
+                    </div>
+                </a>
+                {% endfor %}
+                
+                {% if not products %}
+                    <p style="grid-column: 1 / -1; text-align: center; margin-top: 50px;">
+                        No products are currently available.
+                    </p>
+                {% endif %}
+            </div>
+        
+        {% elif view_mode == 'single_product' %}
+            {% if single_product %}
+            <div class="single-product-view">
+                <div class="detail-info">
+                    <h1>{{ single_product.name }}</h1>
+                    <span class="category">{{ single_product.category }} ({{ single_product.combo_type | upper }})</span>
+                    <div class="price">₹{{ single_product.price }}</div>
+                    
+                    <div class="spec"><strong>Color:</strong> {{ single_product.color }}</div>
+                    <div class="spec"><strong>Material:</strong> {{ single_product.material }}</div>
+                    <div class="spec"><strong>Style:</strong> {{ single_product.style }}</div>
+                    <div class="spec"><strong>Fit:</strong> {{ single_product.fit }}</div>
+                    <div class="spec"><strong>Gender:</strong> {{ single_product.gender }}</div>
+
+                    <h3 style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px; color: var(--color-text-dark);">Try it on! (2D View)</h3>
+                    <p style="font-size: 14px; color: var(--color-text-light);">Click the item below to display it on the mannequin.</p>
+
+                    <div id="combo-item-buttons" style="display: grid; gap: 10px; grid-template-columns: 1fr;">
+                        </div>
+
+                    <div class="bg-color-swatch-container">
+                        <h2 style="color: var(--color-primary); margin-top: 0; font-size: 20px;">Room Background</h2>
+                        <div class="bg-color-swatch-grid" id="bg-color-swatches">
+                            </div>
+                    </div>
+                    <a href="{{ url_for('index', view='products') }}" class="secondary-button" style="background-color: var(--color-text-dark); margin-top: 30px;">Back to Products</a>
+                </div>
+
+                <div id="train-room-2d" class="train-room-2d-container">
+                    <div class="mannequin-silhouette"></div> 
+                </div>
+
+                <script id="single-product-data" type="application/json">
+                    {{ [single_product] | tojson | safe }}
+                </script>
+            </div>
+            {% else %}
+                <div class="form-box">
+                    <h1>Product Not Found</h1>
+                    <p>The requested product ID ({{ request.args.get('product_id') }}) could not be located in our inventory.</p>
+                    <a href="{{ url_for('index', view='products') }}" class="secondary-button">Back to Products</a>
+                </div>
+            {% endif %}
+
+        {% elif view_mode == 'intent' %}
+            <div class="form-box">
+                <h1>What Look Are You Planning?</h1>
+                <form action="{{ url_for('index') }}" method="GET">
+                    <input type="hidden" name="view" value="recommendations">
+                    
+                    <div class="form-group">
+                        <label for="purpose">Purpose / Event Type</label>
+                        <select id="purpose" name="purpose" required>
+                            <option value="" disabled selected>Select an Occasion</option>
+                            <option value="Festival">Festival Celebration</option>
+                            <option value="Marriage">Wedding / Formal Marriage Event</option>
+                            <option value="Birthday">Birthday Party / Casual Event</option>
+                            <option value="Office">Office/Work</option>
+                            <option value="Date">Date Night</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="look_type">Desired Look & Feel</label>
+                        <select id="look_type" name="look_type" required>
+                            <option value="" disabled selected>Select Look Type</option>
+                            <option value="Stylish">Stylish & Trendy</option>
+                            <option value="Decent">Decent & Elegant</option>
+                            <option value="Edgy">Edgy & Bold</option>
+                            <option value="Sporty">Sporty & Relaxed</option>
+                        </select>
+                    </div>
+
+                    <button type="submit">Generate Combos</button>
+                </form>
+            </div>
+        
+        {% elif view_mode == 'recommendations' and combos %}
+            <div class="combo-container">
+                <h1>Outfit Combos for Your {{ purpose }} ({{ look_type }})</h1>
+                <p style="color: var(--color-text-light);">We found 3 perfect matches based on your profile and request. Pick one to see it in the **Fit Room**!</p>
+                
+                <div class="combo-grid">
+                    {% for combo in combos %}
+                    <div class="combo-card">
+                        <h3>Combo #{{ combo.id }}</h3>
+                        <div class="item-list">
+                            {% for item in combo.products %}
+                                <p><img src="{{ item.imageUrl }}" alt="{{ item.name }}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/CCCCCC/333333?text=Item';"> 
+                                    <strong>{{ item.combo_type | upper }}:</strong> {{ item.name }} (₹{{ item.price }})
+                                </p>
+                            {% endfor %}
+                        </div>
+                        <a href="{{ url_for('index', view='train_room', combo_id=combo.id, purpose=purpose, look_type=look_type) }}" class="combo-select-button">
+                            Select & Try in Fit Room
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                <a href="{{ url_for('index', view='intent') }}" class="secondary-button" style="width: 300px;">Change Purpose / Look</a>
+            </div>
+            
+        {% elif view_mode == 'train_room' and train_room_items %}
+            <div class="combo-container">
+                <h1>Your Outfit in the Try-On Room (2D View)</h1>
+                
+                <p style="color: var(--color-text-light);">See how this **{{ look_type }}** look for a **{{ purpose }}** event comes together! **Click an item below to wear it.**</p>
+                
+                <div class="train-room-main-area">
+                    <div id="train-room-2d" class="train-room-2d-container">
+                        <div class="mannequin-silhouette"></div> 
+                    </div>
+
+                    <div id="combo-selector-panel" style="width: 45%; min-width: 300px; max-width: 400px; text-align: left;">
+                        
+                        <h2 style="color: var(--color-primary); margin-top: 0; font-size: 20px;">Outfit Components</h2>
+                        <div id="combo-item-buttons" style="display: grid; gap: 10px; grid-template-columns: 1fr;">
+                            </div>
+
+                        <div class="bg-color-swatch-container">
+                            <h2 style="color: var(--color-primary); margin-top: 0; font-size: 20px;">Try-On Room Background</h2>
+                            <div class="bg-color-swatch-grid" id="bg-color-swatches">
+                                </div>
+                        </div>
+                        </div>
+                </div>
+
+                <script id="train-room-data" type="application/json">
+                    {{ train_room_items | tojson | safe }}
+                </script>
+
+                <div class="reason-box">
+                    <img class="reason-box-image" 
+                                src="{% if look_type == 'Stylish' %}https://images.unsplash.com/photo-1542838323-96b13e9ec2d9?w=100&h=100&fit=crop&q=80{% elif look_type == 'Decent' %}https://images.unsplash.com/photo-1517441221147-987448834d85?w=100&h=100&fit=crop&q=80{% elif look_type == 'Edgy' %}https://images.unsplash.com/photo-1520023640244-a957297e615e?w=100&h=100&fit=crop&q=80{% elif look_type == 'Sporty' %}https://images.unsplash.com/photo-1579730704938-1a527f51b14d?w=100&h=100&fit=crop&q=80{% else %}https://placehold.co/100x100/CCCCCC/333333?text=Style+Tip{% endif %}" 
+                                onerror="this.onerror=null;this.src='https://placehold.co/80x80/CCCCCC/333333?text=Tip';"
+                                alt="Style Tip Visual">
+                    
+                    <div class="reason-box-content">
+                        <p style="font-weight: bold; color: var(--color-accent);">Why we recommended this combo:</p>
+                        <p>{{ combo_reason | safe }}</p>
+                    </div>
+                </div>
+                
+                <a href="{{ url_for('index', view='recommendations', purpose=purpose, look_type=look_type) }}" class="secondary-button" style="width: 300px;">Back to Combo Selection</a>
+            </div>
+
+        {% elif view_mode == 'profile' %}
+            <div class="form-box">
+                {% if user_profile and user_profile.age and request.args.get('edit') != 'true' %}
+                    <h1>👤 My Profile Details</h1>
+                    <div class="detail-item"><span class="detail-label">Name:</span><span class="detail-value">{{ user_profile.name }}</span></div>
+                    <div class="detail-item"><span class="detail-label">Email:</span><span class="detail-value">{{ user_profile.email }}</span></div>
+                    <div class="detail-item"><span class="detail-label">Age:</span><span class="detail-value">{{ user_profile.age }}</span></div>
+                    <div class="detail-item"><span class="detail-label">Gender:</span><span class="detail-value">{{ user_profile.gender }}</span></div>
+                    <div class="detail-item"><span class="detail-label">Height:</span><span class="detail-value">{{ user_profile.height }} cm</span></div>
+                    <div class="detail-item"><span class="detail-label">Weight:</span><span class="detail-value">{{ user_profile.weight }} kg</span></div>
+                    <div class="detail-item"><span class="detail-label">Body Shape:</span><span class="detail-value">{{ user_profile.bodyShape }}</span></div>
+                    <div class="detail-item"><span class="detail-label">Skin Tone:</span><span class="detail-value">{{ user_profile.skinTone }}</span></div>
+                    <a href="{{ url_for('index', view='profile', edit='true') }}" class="secondary-button">Update Details</a>
+                    
+                {% else %}
+                    <h1>{{ 'Update' if user_profile and user_profile.age else 'Complete' }} Your Style Profile</h1>
+                    <form id="profile-form" method="POST" action="{{ url_for('save_profile') }}">
+                        {% set p = user_profile %}
+                        <div class="form-group"><label for="name">Full Name</label><input type="text" id="name" name="name" value="{{ p.name if p else session.get('user_name', '') }}" required></div>
+                        <div class="form-group"><label for="age">Age</label><input type="number" id="age" name="age" min="10" max="100" value="{{ p.age if p else '' }}" required></div>
+                        <div class="form-group"><label for="gender">Gender</label><select id="gender" name="gender" required><option value="" disabled selected>Select Gender</option>{% for g in ['Male', 'Female', 'Other'] %}<option value="{{ g }}" {% if p and p.gender == g %}selected{% endif %}>{{ g }}</option>{% endfor %}</select></div>
+                        <div class="form-group"><label for="height">Height (in cm)</label><input type="number" id="height" name="height" step="0.1" min="50" max="250" value="{{ p.height if p else '' }}" required></div>
+                        <div class="form-group"><label for="weight">Weight (in kg)</label><input type="number" id="weight" name="weight" step="0.1" min="10" max="300" value="{{ p.weight if p else '' }}" required></div>
+                        
+                        <div class="form-group">
+                            <label for="bodyShape_hidden">Body Shape (Select an Image)</label>
+                            <input type="hidden" id="bodyShape_hidden" name="bodyShape" value="{{ p.bodyShape if p else '' }}">
+                            <div class="body-shape-grid" id="body-shape-selector">
+                                
+                                <div class="body-shape-item" data-value="Rectangle">
+                                    <div class="shape-container">
+                                        <svg viewBox="0 0 100 180" preserveAspectRatio="xMidYMid meet"><path class="body-shape-path" d="M 20 0 L 80 0 L 80 180 L 20 180 Z"></path></svg>
+                                    </div>
+                                    <span>Rectangle</span>
+                                </div>
+                                
+                                <div class="body-shape-item" data-value="Triangle">
+                                    <div class="shape-container">
+                                        <svg viewBox="0 0 100 180" preserveAspectRatio="xMidYMid meet"><path class="body-shape-path" d="M 30 0 L 70 0 L 80 180 L 20 180 L 30 0 Z"></path></svg>
+                                    </div>
+                                    <span>Triangle</span>
+                                </div>
+                                
+                                <div class="body-shape-item" data-value="Inverted Triangle">
+                                    <div class="shape-container">
+                                        <svg viewBox="0 0 100 180" preserveAspectRatio="xMidYMid meet"><path class="body-shape-path" d="M 10 0 L 90 0 L 70 180 L 30 180 L 10 0 Z"></path></svg>
+                                    </div>
+                                    <span>Inv. Triangle</span>
+                                </div>
+                                
+                                <div class="body-shape-item" data-value="Hourglass">
+                                    <div class="shape-container">
+                                        <svg viewBox="0 0 100 180" preserveAspectRatio="xMidYMid meet"><path class="body-shape-path" d="M 20 0 L 80 0 Q 85 45 60 70 Q 50 85 40 70 Q 15 45 20 0 Z M 20 180 L 80 180 Q 85 135 60 110 Q 50 95 40 110 Q 15 135 20 180 Z M 35 70 L 65 70 M 35 110 L 65 110"></path></svg>
+                                    </div>
+                                    <span>Hourglass</span>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="skinTone_hidden">Skin Tone (Select a Color)</label>
+                            <input type="hidden" id="skinTone_hidden" name="skinTone" value="{{ p.skinTone if p else '' }}">
+                            <div class="skin-tone-grid" id="skin-tone-selector">
+                                {% set tones = [
+                                    ('Porcelain', '#F7E7D8'), 
+                                    ('Light Beige', '#E8C7A8'), 
+                                    ('Warm Tan', '#D7A779'), 
+                                    ('Olive', '#A0764D'), 
+                                    ('Deep Brown', '#4D2F28')
+                                ] %}
+                                {% for t, color_hex in tones %}
+                                <div class="skin-tone-swatch" data-value="{{ t }}" style="background-color: {{ color_hex }};" title="{{ t }}">
+                                    <i class="fas fa-check" style="display: none;"></i>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <button type="submit"> {{ 'Update' if p and p.age else 'Save' }} Profile</button>
+                    </form>
+                {% endif %}
+            </div>
+            
+        {% endif %}
+    </div>
+
+    <footer class="fashion-footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>StyleSync AI</h3>
+                <p>AI-powered fashion recommendations to help you discover your perfect style.</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-pinterest"></i></a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <a href="{{ url_for('index', view='products') }}">Home</a>
+                <a href="{{ url_for('index', view='intent') }}">Special Look</a>
+                <a href="{{ url_for('index', view='profile') }}">Profile</a>
+                <a href="#">About Us</a>
+            </div>
+            <div class="footer-column">
+                <h3>Customer Service</h3>
+                <a href="#">Contact Us</a>
+                <a href="#">Shipping Info</a>
+                <a href="#">Returns & Exchanges</a>
+                <a href="#">FAQ</a>
+            </div>
+            <div class="footer-column">
+                <h3>Newsletter</h3>
+                <p>Subscribe to get special offers and style tips.</p>
+                <form style="display: flex; margin-top: 15px;">
+                    <input type="email" placeholder="Your email" style="flex-grow: 1; padding: 10px; border: none; border-radius: 4px 0 0 4px;">
+                    <button type="submit" style="background: var(--color-accent); color: white; border: none; padding: 0 15px; border-radius: 0 4px 4px 0; cursor: pointer;">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2023 StyleSync AI. All rights reserved.
+        </div>
+    </footer>
+
+<script>
+    
+    // Map to store the currently worn image element by combo_type (e.g., {'Top': img_element})
+    const wornImages = {}; 
+
+    // --- Function to Handle Wearing an Item in 2D (UPDATED FOR TOGGLE) ---
+    function wear2DItem(item) {
+        const type = item.combo_type;
+        const button = document.getElementById(`btn-${type}`);
+        let imgElement = wornImages[type];
+
+        // 1. Check if the element is currently visible (worn)
+        const isWorn = imgElement && imgElement.style.opacity == 1;
+
+        if (isWorn) {
+            // --- DESELECT (Remove item) ---
+            imgElement.style.opacity = 0; // Hide it
+            if (button) {
+                button.classList.remove('active');
+            }
+        } else {
+            // --- SELECT (Wear item) ---
+
+            if (!imgElement) {
+                // If the image element doesn't exist, create it
+                const container = document.getElementById('train-room-2d');
+                if (!container) return;
+
+                imgElement = document.createElement('img');
+                imgElement.className = 'mannequin-item';
+                
+                // Handle dresses/jumpsuits by putting them in the 'TopBottom' slot
+                const dataType = (type === 'Top' && (item.category.includes('Dress') || item.category.includes('Jumpsuit'))) ? 'TopBottom' : type;
+
+                imgElement.dataset.type = dataType;
+                imgElement.id = `worn-${type}`;
+                
+                container.appendChild(imgElement);
+                wornImages[type] = imgElement;
+                
+                // Set source when first created
+                imgElement.src = item.imageUrl;
+                imgElement.alt = item.name;
+            }
+
+            // Show it
+            imgElement.style.opacity = 1; 
+
+            // Update UI active state 
+            document.querySelectorAll('.combo-item-btn').forEach(btn => btn.classList.remove('active'));
+            if (button) {
+                button.classList.add('active');
+            }
+        }
+    }
+    
+    // --- Function to setup clickable UI buttons ---
+    function setupItemSelection(items, isSingleProduct = false) {
+        const buttonContainer = document.getElementById('combo-item-buttons');
+        if (!buttonContainer) return;
+
+        // Clear existing buttons
+        buttonContainer.innerHTML = ''; 
+        
+        // If it's a single product view, update the title
+        const titleElement = buttonContainer.previousElementSibling;
+        if (isSingleProduct && titleElement && titleElement.tagName === 'P') {
+              // titleElement is the <p> element for single product view, we target the previous h3
+              const h3Title = titleElement.previousElementSibling;
+              if (h3Title && h3Title.tagName === 'H3') {
+                  h3Title.textContent = "Click to Wear Item:";
+                  h3Title.style.color = 'var(--color-text-dark)';
+              }
+        }
+
+
+        items.forEach((item) => {
+            const btn = document.createElement('div');
+            btn.className = 'combo-item-btn';
+            btn.id = `btn-${item.combo_type}`; // Unique ID based on type
+            btn.innerHTML = `
+                <img src="${item.imageUrl}" alt="${item.name}" class="item-img" onerror="this.onerror=null;this.src='https://placehold.co/50x50/CCCCCC/333333?text=Item';">
+                <div>
+                    <div class="item-name">${item.combo_type}</div>
+                    <small>${item.name}</small>
+                </div>
+            `;
+            // Item only shows/hides on click
+            btn.addEventListener('click', () => {
+                wear2DItem(item);
+            });
+            buttonContainer.appendChild(btn);
+        });
+
+        // No automatic wearing on load, as per previous request.
+    }
+
+
+    // --- Function to change the background color ---
+    function changeRoomColor(color, swatchButton) {
+        const container = document.getElementById('train-room-2d');
+        if (!container) return;
+
+        // Change background
+        container.style.backgroundColor = color;
+        container.style.backgroundImage = 'none'; // Clear any default background image
+
+        // Update active state on swatches
+        document.querySelectorAll('.bg-color-swatch').forEach(swatch => swatch.classList.remove('active'));
+        swatchButton.classList.add('active');
+    }
+
+    // --- Function to setup color swatch buttons ---
+    function setupColorSelection() {
+        const colorSwatchesContainer = document.getElementById('bg-color-swatches');
+        if (!colorSwatchesContainer) return;
+
+        const colors = [
+            { name: 'Plain White', hex: '#ffffff' },
+            { name: 'Plain Red', hex: '#f08080' },
+            { name: 'Plain Blue', hex: '#87cefa' },
+            { name: 'Plain Green', hex: '#90ee90' },
+            { name: 'Plain Black', hex: '#404040' }
+        ];
+
+        colors.forEach(color => {
+            const swatch = document.createElement('div');
+            swatch.className = 'bg-color-swatch';
+            swatch.title = color.name;
+            swatch.style.backgroundColor = color.hex;
+
+            // Set the default color (Plain White) to be active on load
+            if (color.name === 'Plain White') {
+                swatch.classList.add('active');
+            }
+
+            swatch.addEventListener('click', () => {
+                changeRoomColor(color.hex, swatch);
+            });
+
+            colorSwatchesContainer.appendChild(swatch);
+        });
+    }
+
+    // --- NEW: Profile Selection Logic ---
+    function setupProfileSelectors() {
+        const skinToneSelector = document.getElementById('skin-tone-selector');
+        const skinToneHidden = document.getElementById('skinTone_hidden');
+        const bodyShapeSelector = document.getElementById('body-shape-selector');
+        const bodyShapeHidden = document.getElementById('bodyShape_hidden');
+        
+        // Initial selected values from the server-side
+        const initialSkinTone = skinToneHidden ? skinToneHidden.value : '';
+        const initialBodyShape = bodyShapeHidden ? bodyShapeHidden.value : '';
+
+
+        // 1. Skin Tone Selection
+        if (skinToneSelector) {
+            skinToneSelector.querySelectorAll('.skin-tone-swatch').forEach(swatch => {
+                const toneValue = swatch.dataset.value;
+
+                // Set initial state
+                if (toneValue === initialSkinTone) {
+                    swatch.classList.add('selected');
+                    swatch.querySelector('i').style.display = 'block';
+                }
+
+                swatch.addEventListener('click', () => {
+                    // Deselect all
+                    skinToneSelector.querySelectorAll('.skin-tone-swatch').forEach(s => {
+                        s.classList.remove('selected');
+                        s.querySelector('i').style.display = 'none';
+                    });
+                    
+                    // Select current
+                    swatch.classList.add('selected');
+                    swatch.querySelector('i').style.display = 'block';
+                    if (skinToneHidden) skinToneHidden.value = toneValue;
+                });
+            });
+        }
+
+
+        // 2. Body Shape Selection
+        if (bodyShapeSelector) {
+            bodyShapeSelector.querySelectorAll('.body-shape-item').forEach(item => {
+                const shapeValue = item.dataset.value;
+
+                // Set initial state
+                if (shapeValue === initialBodyShape) {
+                    item.classList.add('selected');
+                }
+
+                item.addEventListener('click', () => {
+                    // Deselect all
+                    bodyShapeSelector.querySelectorAll('.body-shape-item').forEach(i => {
+                        i.classList.remove('selected');
+                    });
+                    
+                    // Select current
+                    item.classList.add('selected');
+                    if (bodyShapeHidden) bodyShapeHidden.value = shapeValue;
+                });
+            });
+        }
+    }
+
+
+    // --- Document Ready / Main Entry Point ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const trainRoomDataScript = document.getElementById('train-room-data');
+        const singleProductDataScript = document.getElementById('single-product-data');
+
+        let items = null;
+        let isSingleProduct = false;
+
+        if (trainRoomDataScript) {
+            // This is the multi-item combo view
+            items = JSON.parse(trainRoomDataScript.textContent);
+            setupColorSelection(); // Call the new setup function for the try-on room
+        } else if (singleProductDataScript) {
+            // This is the single product detail view
+            items = JSON.parse(singleProductDataScript.textContent);
+            isSingleProduct = true;
+            setupColorSelection(); // Also enable for single product view
+        }
+
+
+        if (items && items.length > 0) {
+            // Initialize the UI and load item buttons
+            setupItemSelection(items, isSingleProduct);
+        }
+
+        // Call setup function for profile selectors
+        setupProfileSelectors();
+    });
+</script>
+</body>
+</html>
