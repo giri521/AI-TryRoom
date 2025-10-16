@@ -382,6 +382,7 @@
             border-radius: 8px; 
             font-weight: 600; 
             transition: all 0.3s ease;
+            cursor: pointer; /* Added for button type */
         }
         .secondary-button:hover {
             background-color: #0f0f1f;
@@ -895,7 +896,7 @@
     <div class="hero-search-container search-container">
         <form action="{{ url_for('index') }}" method="GET">
             <input type="text" name="search" placeholder="Search for products, brands and more" 
-                            value="{{ request.args.get('search', '') }}">
+                           value="{{ request.args.get('search', '') }}">
             <button type="submit"><i class="fas fa-search"></i></button>
         </form>
     </div>
@@ -1070,9 +1071,9 @@
 
                 <div class="reason-box">
                     <img class="reason-box-image" 
-                                src="{% if look_type == 'Stylish' %}https://images.unsplash.com/photo-1542838323-96b13e9ec2d9?w=100&h=100&fit=crop&q=80{% elif look_type == 'Decent' %}https://images.unsplash.com/photo-1517441221147-987448834d85?w=100&h=100&fit=crop&q=80{% elif look_type == 'Edgy' %}https://images.unsplash.com/photo-1520023640244-a957297e615e?w=100&h=100&fit=crop&q=80{% elif look_type == 'Sporty' %}https://images.unsplash.com/photo-1579730704938-1a527f51b14d?w=100&h=100&fit=crop&q=80{% else %}https://placehold.co/100x100/CCCCCC/333333?text=Style+Tip{% endif %}" 
-                                onerror="this.onerror=null;this.src='https://placehold.co/80x80/CCCCCC/333333?text=Tip';"
-                                alt="Style Tip Visual">
+                                 src="{% if look_type == 'Stylish' %}https://images.unsplash.com/photo-1542838323-96b13e9ec2d9?w=100&h=100&fit=crop&q=80{% elif look_type == 'Decent' %}https://images.unsplash.com/photo-1517441221147-987448834d85?w=100&h=100&fit=crop&q=80{% elif look_type == 'Edgy' %}https://images.unsplash.com/photo-1520023640244-a957297e615e?w=100&h=100&fit=crop&q=80{% elif look_type == 'Sporty' %}https://images.unsplash.com/photo-1579730704938-1a527f51b14d?w=100&h=100&fit=crop&q=80{% else %}https://placehold.co/100x100/CCCCCC/333333?text=Style+Tip{% endif %}" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/80x80/CCCCCC/333333?text=Tip';"
+                                 alt="Style Tip Visual">
                     
                     <div class="reason-box-content">
                         <p style="font-weight: bold; color: var(--color-accent);">Why we recommended this combo:</p>
@@ -1144,27 +1145,51 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="skinTone_hidden">Skin Tone (Select a Color)</label>
-                            <input type="hidden" id="skinTone_hidden" name="skinTone" value="{{ p.skinTone if p else '' }}">
-                            <div class="skin-tone-grid" id="skin-tone-selector">
-                                {% set tones = [
-                                    ('Porcelain', '#F7E7D8'), 
-                                    ('Light Beige', '#E8C7A8'), 
-                                    ('Warm Tan', '#D7A779'), 
-                                    ('Olive', '#A0764D'), 
-                                    ('Deep Brown', '#4D2F28')
-                                ] %}
-                                {% for t, color_hex in tones %}
-                                <div class="skin-tone-swatch" data-value="{{ t }}" style="background-color: {{ color_hex }};" title="{{ t }}">
-                                    <i class="fas fa-check" style="display: none;"></i>
+                            <label for="skinTone_hidden">Skin Tone</label>
+                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                                <button type="button" class="secondary-button" id="open-camera-btn" style="flex-grow: 1; background-color: var(--color-primary);">
+                                    <i class="fas fa-camera"></i> AI Detect from Photo
+                                </button>
+                                <button type="button" class="secondary-button" id="manual-select-btn" style="flex-grow: 1; background-color: var(--color-text-light);">
+                                    Manual Select
+                                </button>
+                            </div>
+                            
+                            <div id="manual-skin-tone-container">
+                                <label for="skinTone_hidden" style="margin-top: 15px; font-weight: 400;">(Or Select a Color Manually):</label>
+                                <input type="hidden" id="skinTone_hidden" name="skinTone" value="{{ p.skinTone if p else '' }}">
+                                <div class="skin-tone-grid" id="skin-tone-selector">
+                                    {% set tones = [
+                                        ('Porcelain', '#F7E7D8'), 
+                                        ('Light Beige', '#E8C7A8'), 
+                                        ('Warm Tan', '#D7A779'), 
+                                        ('Olive', '#A0764D'), 
+                                        ('Deep Brown', '#4D2F28')
+                                    ] %}
+                                    {% for t, color_hex in tones %}
+                                    <div class="skin-tone-swatch" data-value="{{ t }}" style="background-color: {{ color_hex }};" title="{{ t }}">
+                                        <i class="fas fa-check" style="display: none;"></i>
+                                    </div>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
                             </div>
                         </div>
 
                         <button type="submit"> {{ 'Update' if p and p.age else 'Save' }} Profile</button>
                     </form>
                 {% endif %}
+            </div>
+            
+            <div id="camera-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
+                <div style="background: white; padding: 20px; border-radius: 10px; max-width: 90%; text-align: center;">
+                    <h2 style="color: var(--color-primary);">Capture Skin Tone</h2>
+                    <video id="video" width="300" height="225" autoplay style="border: 1px solid #ccc; border-radius: 5px;"></video>
+                    <canvas id="canvas" width="300" height="225" style="display:none;"></canvas>
+                    <div style="margin-top: 20px;">
+                        <button type="button" id="capture-btn" class="cta-button" style="padding: 10px 20px; font-size: 16px;">Take Photo</button>
+                        <button type="button" id="close-camera-btn" class="secondary-button" style="padding: 10px 20px; font-size: 16px; margin-left: 10px; background-color: var(--color-text-light);">Close</button>
+                    </div>
+                </div>
             </div>
             
         {% endif %}
@@ -1354,7 +1379,7 @@
         });
     }
 
-    // --- NEW: Profile Selection Logic ---
+    // --- Profile Selection Logic ---
     function setupProfileSelectors() {
         const skinToneSelector = document.getElementById('skin-tone-selector');
         const skinToneHidden = document.getElementById('skinTone_hidden');
@@ -1418,6 +1443,140 @@
     }
 
 
+    // --- NEW: Camera/AI Skin Tone Logic ---
+    const openCameraBtn = document.getElementById('open-camera-btn');
+    const manualSelectBtn = document.getElementById('manual-select-btn');
+    const cameraModal = document.getElementById('camera-modal');
+    const closeCameraBtn = document.getElementById('close-camera-btn');
+    const captureBtn = document.getElementById('capture-btn');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const manualContainer = document.getElementById('manual-skin-tone-container');
+
+    let stream = null;
+
+    // Function to start the camera stream
+    async function startCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("Your browser does not support camera access. Please use the manual selector.");
+            return;
+        }
+
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            video.style.display = 'block';
+            canvas.style.display = 'none';
+            captureBtn.textContent = 'Take Photo';
+            captureBtn.disabled = false;
+            cameraModal.style.display = 'flex';
+            
+            // UI state for skin tone controls
+            if (manualContainer) manualContainer.style.display = 'none';
+            if (manualSelectBtn) manualSelectBtn.style.backgroundColor = 'var(--color-text-light)';
+            if (openCameraBtn) openCameraBtn.style.backgroundColor = 'var(--color-accent)';
+
+        } catch (err) {
+            console.error("Camera error:", err);
+            alert("Camera access denied or device not found. Please use the manual selector.");
+            cameraModal.style.display = 'none';
+            if (manualContainer) manualContainer.style.display = 'block';
+            if (manualSelectBtn) manualSelectBtn.style.backgroundColor = 'var(--color-accent)';
+            if (openCameraBtn) openCameraBtn.style.backgroundColor = 'var(--color-primary)';
+        }
+    }
+
+    // Function to stop the camera stream
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        if (video) video.srcObject = null;
+        if (cameraModal) cameraModal.style.display = 'none';
+        
+        // UI state restoration
+        if (manualContainer) manualContainer.style.display = 'block';
+        if (manualSelectBtn) manualSelectBtn.style.backgroundColor = 'var(--color-accent)';
+        if (openCameraBtn) openCameraBtn.style.backgroundColor = 'var(--color-primary)';
+    }
+
+    if (openCameraBtn) {
+        openCameraBtn.addEventListener('click', startCamera);
+    }
+
+    if (manualSelectBtn) {
+        manualSelectBtn.addEventListener('click', stopCamera); // Stop camera when switching to manual
+    }
+
+    if (closeCameraBtn) {
+        closeCameraBtn.addEventListener('click', stopCamera);
+    }
+
+    if (captureBtn) {
+        captureBtn.addEventListener('click', () => {
+            // 1. Capture frame to canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, 300, 225);
+            
+            // 2. Convert canvas to base64 image data
+            const imageDataURL = canvas.toDataURL('image/jpeg');
+            
+            // 3. Update UI
+            captureBtn.textContent = 'Analyzing...';
+            captureBtn.disabled = true;
+            video.style.display = 'none'; 
+            
+            // 4. Send to backend
+            fetch('/detect_skin_tone', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ image: imageDataURL })
+            })
+            .then(response => response.json())
+            .then(data => {
+                stopCamera(); // Close camera once result is back
+                if (data.status === 'success') {
+                    const detectedTone = data.skinTone;
+                    
+                    // Set the hidden input value
+                    const skinToneHidden = document.getElementById('skinTone_hidden');
+                    if (skinToneHidden) {
+                        skinToneHidden.value = detectedTone;
+                    }
+                    
+                    // Update the visual swatches to show the detected tone as selected
+                    const skinToneSelector = document.getElementById('skin-tone-selector');
+                    if (skinToneSelector) {
+                         // Deselect all
+                        skinToneSelector.querySelectorAll('.skin-tone-swatch').forEach(s => {
+                            s.classList.remove('selected');
+                            s.querySelector('i').style.display = 'none';
+                            
+                            // Select the detected one
+                            if (s.dataset.value === detectedTone) {
+                                s.classList.add('selected');
+                                s.querySelector('i').style.display = 'block';
+                            }
+                        });
+                    }
+                    alert(`AI Detected Skin Tone: ${detectedTone}. Remember to save your profile!`);
+
+                } else {
+                    alert(`Detection Failed: ${data.message}. Please select manually.`);
+                }
+            })
+            .catch(error => {
+                stopCamera();
+                console.error('Error:', error);
+                alert("An error occurred during detection. Please select manually.");
+            });
+        });
+    }
+
+
     // --- Document Ready / Main Entry Point ---
     document.addEventListener('DOMContentLoaded', () => {
         const trainRoomDataScript = document.getElementById('train-room-data');
@@ -1445,6 +1604,13 @@
 
         // Call setup function for profile selectors
         setupProfileSelectors();
+
+        // Initial setup for the profile view to show manual selector by default
+        if (manualContainer && openCameraBtn) {
+            manualContainer.style.display = 'block';
+            manualSelectBtn.style.backgroundColor = 'var(--color-accent)';
+            openCameraBtn.style.backgroundColor = 'var(--color-primary)';
+        }
     });
 </script>
 </body>
