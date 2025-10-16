@@ -347,8 +347,7 @@ def save_profile():
 
 
 if __name__ == "__main__":
-    # Use the PORT environment variable set by Render, default to 5000 for local testing
     port = int(os.environ.get("PORT", 5000))
-    # Bind to 0.0.0.0 so external services (like Render) can access it
     app.run(host="0.0.0.0", port=port, debug=True)
+
 
